@@ -1,0 +1,361 @@
+
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: "Montserrat", sans-serif;
+}
+
+:root {
+	--gradient-color-1: #e8cab9;
+	--gradient-color-2: #a96d3d;
+
+	--dots-size: 8px;
+	--solid-borders-width: 2px;
+	--gradient-borders-width: 2px;
+}
+
+img {
+	max-width: 100%;
+}
+
+h1 {
+	font-size: 12.5rem;
+}
+
+h2 {
+	font-size: 5rem;
+}
+
+h3 {
+	font-weight: 500;
+	font-size: 3.75rem;
+}
+
+h4 {
+	font-weight: 400;
+	font-size: 2.5rem;
+}
+
+.app {
+	position: relative;
+	overflow-x: hidden;
+}
+
+.fireworks {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: radial-gradient(circle at 50% 50%, rgba(54, 55, 63, 1) 0%, rgba(54, 55, 63, 1) 25%, rgba(36, 37, 39, 1) 70%, rgba(1,1,1,1) 100%);
+	z-index: -1;
+}
+
+svg {
+	stroke-dasharray: 900;
+	stroke-dashoffset: 900;
+	transition: stroke-dashoffset 5s;
+	overflow: visible;
+}
+
+svg.active {
+	stroke-dashoffset: 0;
+}
+
+svg defs radialGradient stop {
+	stop-color: #0000;
+	transition: stop-color 5s;
+}
+
+svg.active defs radialGradient stop:first-child {
+	stop-color: #E8CAB9;
+}
+
+svg.active defs radialGradient stop:last-child {
+	stop-color: #A96D3D;
+}
+
+.svgtext-div {
+	display: flex;
+	gap: 3rem;
+	transform: scale(1.4);
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+
+.front {
+	width: 100vw;
+	height: 100vh;
+	min-height: 100vh;	
+	position: relative;
+}
+
+.front-bg {
+	position: absolute;
+	height: 60%;
+	width: 100%;
+	background-image: url('../static/bg_pattern.png');
+	background-size: 10%;
+	top: 0;
+	bottom: 0;
+	margin: auto;
+	background-repeat: repeat;
+	z-index: 0;
+}
+
+.front img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	z-index: 1;
+	position: relative;
+}
+
+.front .banner {
+	width: 100%;
+	height: 20%;
+	position: absolute;
+	bottom: 0
+}
+
+.back {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	padding: 50px;
+}
+
+.head {
+	font-size: 2.5rem;
+	position: relative;
+	letter-spacing: 0.5rem;
+	width: 100%;
+	text-align: center;
+	padding: 2rem;
+}
+
+.title-name {
+	width: 100%;
+	display: flex;
+	position: relative;
+	flex-direction: column;
+	align-items: center;
+	padding-top: 4rem;
+	padding-bottom: 3rem;
+	text-align: center;
+}
+
+.title-name h1 {
+	font-family: "Dancing Script", cursive;
+}
+
+.title-name h2 {
+	font-weight: 100;
+	font-family: "Permanent Marker", cursive;
+}
+
+.info {
+	width: 100%;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 50px;
+	padding: 2rem;
+	letter-spacing: 0.5rem;
+}
+
+.info--date {
+	display: flex;
+	align-items: center;
+	place-content: center;
+	width: 100%;
+	gap: 40px;
+}
+
+.info > p {
+	font-weight: 500;
+	text-align: center;
+	font-size: 1.5rem;
+	line-height: 2.25rem;
+	letter-spacing: 0.3rem;
+}
+
+.info--dress-code {
+	display: flex;
+	gap: 50%;
+	min-width: max-content;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+}
+
+.info--dress-code::before {
+	content: '';
+	position: absolute;
+	height: 100%;
+	width: var(--gradient-borders-width);
+	background: linear-gradient(to bottom, transparent 0%, var(--gradient-color-2) 30%, var(--gradient-color-1) 50%, var(--gradient-color-2) 70%, transparent 100%);
+}
+
+.info img {
+	height: 10rem;
+}
+
+.info--buttons {
+	display: flex;
+	gap: 15px;
+	padding: 0 20px;
+}
+
+.info--buttons a {
+	font-size: 1.8rem;
+	letter-spacing: 0.1rem;
+	border: 1px solid var(--gradient-color-2);
+	padding: 0.8rem 3rem;
+	cursor: pointer;
+	user-select: none;
+	text-align: center;
+}
+
+.info--buttons a:hover {
+	background: rgba(36, 37, 39, 0.1);
+}
+
+.info--buttons a:active {
+	background: rgba(36, 37, 39, 0.1);
+	border: 1px solid var(--gradient-color-1);	
+}
+
+.box {
+	position: relative;
+	min-width: max-content;
+	font-size: 1.5rem;
+	width: 33%;
+	max-width: 400px;
+	padding: 1.5rem 0;
+	display: grid;
+	place-content: center;
+}
+
+.bottom-border {
+	width: 100%;
+	position: relative;
+}
+
+
+.gradient-text {
+	background: -webkit-radial-gradient(var(--gradient-color-1) 0%, var(--gradient-color-2) 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.gradient-border::before,
+.gradient-border::after {
+	left: 0;
+	content: '';
+	width: 100%;
+	height: var(--gradient-borders-width);
+	position: absolute;
+	background: linear-gradient(to right, transparent 0%, var(--gradient-color-2) 30%, var(--gradient-color-1) 50%, var(--gradient-color-2) 70%, transparent 100%);
+}
+
+.gradient-border::before {
+	top: 1px;
+}
+
+.gradient-border::after {
+	bottom: 0;
+}
+
+.solid-border::before {
+	left: 0;
+	content: '';
+	width: 100%;
+	height: var(--solid-borders-width);
+	position: absolute;
+	background: linear-gradient(to right, var(--gradient-color-2) 0%, var(--gradient-color-1) 50%, var(--gradient-color-2) 100%);
+}
+
+.solid-border::before {
+	top: 0px;
+}
+
+.border-dots::before,
+.border-dots::after {
+	content: '';
+	position: absolute;
+	border-radius: 50%;
+	padding: var(--dots-size);
+	background: var(--gradient-color-1);
+	top: calc(var(--gradient-borders-width) - var(--dots-size))
+}
+
+.border-dots::before {
+	left: 0;
+}
+
+.border-dots::after {
+	right: 0;
+}
+
+
+@media only screen and (max-width: 1000px) {
+
+	:root {
+		font-size: 12px;
+	}
+
+	.svgtext-div {
+		transform: scale(1.1);
+	}
+
+	.back {
+		padding: 40px;
+	}
+
+} 
+
+@media only screen and (max-width: 750px) {
+
+	:root {
+		font-size: 10px;
+	}
+
+
+	.svgtext-div {
+		transform: scale(1);
+	}
+
+	.back {
+		padding: 30px;
+	}
+} 
+
+@media only screen and (max-width: 550px) {
+
+	.svgtext-div {
+		transform: scale(0.9);
+	}
+
+	.back {
+		padding: 20px;
+	}
+} 
+
+@media only screen and (max-width: 400px) {
+
+	:root {
+		font-size: 8px;
+	}
+
+	.svgtext-div {
+		transform: scale(0.8);
+	}
+
+	.back {
+		padding: 10px;
+	}
+
+} 
