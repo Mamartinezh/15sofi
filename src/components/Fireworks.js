@@ -9,37 +9,44 @@ const secondBang = './second-bang.wav'
 
 const settings = {
 	0: {
-		r: 3,
-		d: 800,
-		f: 6,
-		n: 40
+		r1: 1,
+		r2: 1,
+		d: 200,
+		f1: 6,
+		f2: 8,
+		n: 20,
+		vi: 8,
+		vf: 2
 	},
 	1: {
-		r: 2,
-		d: 400,
-		f: 8,
-		n: 30
-	},
-	2: {
-		r: 1,
-		d: 250,
-		f: 10,
-		n: 20
+		r1: 2.0,
+		r2: 2.5,
+		d: 500,
+		f1: 6,
+		f2: 8,
+		n: 50,
+		vi: 8,
+		vf: 4
 	}
 }
 
-export default function Fireworks() {
+export default function Fireworks({enabled=false, offset=0, onFinish=null, top=100}) {
 
-	const sId = useRef()
 	const ctx = useRef()
+	const sets = useRef()
 	const canvas = useRef()
 	const gradient = useRef()
 	const fireworks = useRef([])
+	const enableFire = useRef(false)
 
 	useEffect(()=>{
 
-		//Configuring settings
-		sId.current = window.innerHeight < 750 ? 2 : window.innerHeight < 1000 ? 1 : 0
+		// Getting settings for size and updating canvas size
+		sets.current = settings[0]
+		if (!window.mobileAndTabletCheck()) {
+			addEventListener('resize', updateSizes); 
+			sets.current = settings[1]
+		}
 
 		//Getting context and initializing sizes
 		ctx.current = canvas.current.getContext("2d")
@@ -48,34 +55,26 @@ export default function Fireworks() {
 
 		//Creating background gradient
 		const grad = ctx.current.createRadialGradient(window.innerWidth / 2, window.innerHeight, 0, window.innerWidth / 2, window.innerHeight, canvas.current.scrollHeight)
-		grad.addColorStop(0, 'rgba(54, 55, 63, 1)')
+		grad.addColorStop(0, 'rgba(44, 45, 53, 1)')
 		grad.addColorStop(1, 'rgba(1,1,1,1)')
 		ctx.current.fillStyle = grad
 		ctx.current.fillRect(0, 0, window.innerWidth, canvas.current.scrollHeight)
 
-		//Creating gradient for animations clearing
-		gradient.current = ctx.current.createRadialGradient(window.innerWidth / 2, window.innerHeight, 0, window.innerWidth / 2, window.innerHeight, canvas.current.scrollHeight);
-		gradient.current.addColorStop(0, 'rgba(54, 55, 63, 0.05)')
-		gradient.current.addColorStop(1, 'rgba(1,1,1,0.05)')
-		animate()
-		randomFire()
+	}, [canvas.current])
 
-		console.log(window.mobileAndTabletCheck())
+	useEffect(()=>{
+		if (enabled) {
 
-		if (!window.mobileAndTabletCheck()) {
-			addEventListener('resize', updateSizes); 
-		}
+			animate()
+			randomFire()
 
-		addEventListener('click', fire)
-
-		return () => {
-			removeEventListener('click', fire)
-			if (!window.mobileAndTabletCheck()) {
-				removeEventListener('resize', updateSizes)
+			return () => {
+				if (!window.mobileAndTabletCheck()) {
+					removeEventListener('resize', updateSizes)
+				}
 			}
 		}
-
-	}, [canvas.current])
+	}, [enabled])
 
 
 	function updateSizes() {
@@ -85,13 +84,8 @@ export default function Fireworks() {
 
 
 	function animate() {
-		requestAnimationFrame(animate)
-
-		ctx.current.fillStyle = gradient.current
-		ctx.current.fillRect(0, 0, window.innerWidth, canvas.current.scrollHeight)	
-
+		if (enabled) requestAnimationFrame(animate)
 		updateFireworks()
-
 	}
 
 	function updateFireworks() {
@@ -103,11 +97,21 @@ export default function Fireworks() {
 				let i = 15
 				while(i--) {
 					let ang = Math.random() * 180
-					let vel = Math.random() * 4
 					let s = Math.random() * 50 + 25
 					let l = Math.random() * 50 + 25
+					let vel = Math.random() * sets.current.vf
 					let color = `hsl(${huePalette[colIdx]}, ${s}%, ${l}%)`
-					let firework = new Firework(ctx.current, f.x, f.y, ang, vel, 1000000, color, 10, 0, settings[sId.current])
+					let firework = new Firework(ctx.current, {
+						x: f.x,
+						y: f.y,
+						ang,
+						color,
+						dur: 1,
+						dur: 2,
+						vi: vel,
+						r: sets.current.r2,
+						gFactor: sets.current.f2,
+					})
 					fireworks.current.push(firework)			
 				}
 				fireworks.current.splice(idx, 1)
@@ -116,28 +120,44 @@ export default function Fireworks() {
 		}
 	}
 
-	function fire(e) {
-		let cx = e.clientX 
-		let cy = e.clientY + window.scrollY
-		cx = cx > window.innerWidth / 2 ? window.innerWidth : 0
-		let a = Math.random() * 35 + 45
-		a =  cx===0 ? a : a + 45
-		singleFire(cx, cy, a)
-	}
-
 	function randomFire() {
-		for (let i = 1; i<=settings[sId.current].n; i++) {
-			let x = Math.floor(Math.random() * 2) ? 0 : window.innerWidth
-			let y = Math.random() *  canvas.current.scrollHeight
-			let a = Math.random() * 35 + 45
-			a =  x===0 ? a : a + 45
-			setTimeout(()=>singleFire(x,y,a), Math.random() * 15000)
+		for (let i = 1; i<=sets.current.n; i++) {
+			let x = (Math.random() * 0.8 + 0.1) * window.innerWidth
+			let y = window.innerHeight + offset
+			let a = (Math.random() * 0.57 + 1) * 70
+			setTimeout(()=>singleFire(x,y,a), Math.random() * 5000)
 		}
+		setTimeout(()=>clearCanvas(), 0)
 	}
 
-	function singleFire(x, y, a) {
-		let firework = new Firework(ctx.current, x, y, a, 10, null, "#fff", 6, 0, settings[sId.current])
+	function singleFire(x, y, ang) {
+		let firework = new Firework(ctx.current, {
+			x,
+			y,
+			ang,
+			dur: 2,
+			r: sets.current.r1,
+			vi: sets.current.vi,
+			gFactor: sets.current.f1,
+			dist: Math.max(100, Math.random() * top),
+		})
 		fireworks.current.push(firework)
+	}
+
+	async function clearCanvas(alpha=0.5) {
+		if (alpha<=1) {
+			await new Promise(r=>setTimeout(r, 100))
+			let grad = ctx.current.createRadialGradient(window.innerWidth / 2, window.innerHeight, 0, window.innerWidth / 2, window.innerHeight, canvas.current.scrollHeight);
+			grad.addColorStop(0, `rgba(44, 45, 53, ${alpha})`)
+			grad.addColorStop(1, `rgba(1,1,1, ${alpha})`)
+			ctx.current.fillStyle = grad
+			ctx.current.fillRect(0, 0, window.innerWidth, canvas.current.scrollHeight)
+			clearCanvas(alpha+(2/(8*60)))
+		}
+		else {
+			enabled = false
+			if (onFinish) onFinish()
+		}
 	}
 
 	return (
@@ -148,23 +168,22 @@ export default function Fireworks() {
 
 }
 
-
-
-const Firework = function(ctx, x, y, ang, vi, expDist, color, gFactor, sample, sets={}) {
+const Firework = function(ctx,  sets={}) {
 
 	this.g = -9.81
-	this.color = color					/* color of the firework */
-	this.gFactor = sets.f??gFactor		/* gravity reduction factor */
-	this.ang = ang;						/* angle during launch */
-	this.vi = vi;						/* launch velocity */
-	this.expDist = expDist??sets.d;		/* distance before explode */
-	this.rad = sets.r??1;				/* radius before explosion */
-	this.inT = performance.now()		/* initial time */
-	this.dist = 0						/* cover distance keeper */
-	this.opacity = 1					/* initial opacity */
+	this.color = sets.color??'#fff'					/* color of the firework */
+	this.gFactor = sets.gFactor??1 					/* Gravity reduction factor */
+	this.ang = sets.ang??90;								/* angle during launch */
+	this.vi = sets.vi??8;										/* launch velocity */
+	this.expDist = sets.dist??100000;				/* distance before explode */
+	this.rad = sets.r??1.5;									/* radius before explosion */
+	this.inT = performance.now()						/* initial time */
+	this.dist = 0														/* cover distance keeper */
+	this.opacity = 1.0											/* initial opacity */
 	this.ctx = ctx
-	this.x = x;
-	this.y = y;
+	this.x = sets.x??0;
+	this.y = sets.y??0;
+	this.dur = sets.dur??3
 	this.viy = Math.sin(this.ang * (Math.PI / 180)) * this.vi
 	this.vix = Math.cos(this.ang * (Math.PI / 180)) * this.vi
 
@@ -190,7 +209,7 @@ const Firework = function(ctx, x, y, ang, vi, expDist, color, gFactor, sample, s
 		this.dist += Math.sqrt(this.dy**2 + this.vix**2)
 		this.y -= this.dy;
 		this.x += this.vix;
-		this.opacity -= 0.006
+		this.opacity -= (1 / (this.dur * 60))
 		this.draw();
 	}
 }
